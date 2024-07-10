@@ -1,6 +1,6 @@
 /*
-        File: ATC-dp_l.cpp
-        Date and Time Created: 2024-06-25 01:19:59
+        File: ATC-dp_m.cpp
+        Date and Time Created: 2024-06-25 14:46:20
         Author: Rahul M. Navneeth
 */
 
@@ -97,43 +97,34 @@ void precision(int a) { cout << setprecision(a) << fixed; }
 // CONSTANTS
 const float PI = 3.141592653589793238462;
 const int MOD = 1e9 + 7;
-const int mxn = 3e3+2;
+const int mxn = 102, mxm = 1e5+1;
 
 /* --------------------- CODE BEGINS ---------------------- */
 
-int N;
+ll N, K;
 ll a[mxn];
-ll dp[mxn][mxn];
+ll dp[mxm];
+ll prefix[mxm];
 
 void solve() {
-	cin >> N;
-	ll s = 0;
-	for(int i = 0 ; i < N ; i++) {
-		cin >> a[i];
-		s+=a[i];
-	}
-	for(int i = N - 1 ; i >= 0 ; i--) {
-		for(int j = i ; j < N ; j++) {
-			if(i == j) {
-				dp[i][j] = a[i];
-				continue;
-			}
-			dp[i][j] = max(min(dp[i+2][j], dp[i+1][j-1]) + a[i], min(dp[i+1][j-1], dp[i][j-2]) + a[j]);
-		}
-	}
-	// for(int i = 0 ; i < N ; i++) {
-	// 	for(int j = 0 ; j < N ; j++) {
-	// 		cout << dp[i][j] << " ";
-	// 	}
-	// 	cout << "\n";
-	// }
-	cout << dp[0][N-1]-(s-dp[0][N-1]) << "\n";
+	cin >> N >> K;
+	for(ll i = 0 ; i < N ; i++) cin >> a[i];
+	memset(dp,0,sizeof dp);
+	dp[0] = 1;
+	for(ll i = 0; i < N; i++) {
+ 		memset(prefix, 0, sizeof(prefix));
+        prefix[0] = dp[0];
+        for(ll j = 1; j <= K; j++) {
+            prefix[j] = mod_add(prefix[j-1], dp[j], MOD);
+        }
+        for(ll j = K; j >= 0; j--) {
+            ll min_index = max((ll)0, j - a[i]);
+            dp[j] = (prefix[j] - (min_index > 0 ? prefix[min_index - 1] : 0) + MOD) % MOD;
+        }
+    }
+	cout << dp[K] << "\n";
 	return;
 }
-
-// 1 0 0 0
-// 2 1 0 0
-// 3 2 1 0
 
 /*---------------------- MAIN DRIVER ------------------------*/
 

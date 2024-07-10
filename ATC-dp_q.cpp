@@ -1,6 +1,6 @@
 /*
-        File: ATC-dp_l.cpp
-        Date and Time Created: 2024-06-25 01:19:59
+        File: ATC-dp_q.cpp
+        Date and Time Created: 2024-07-05 13:00:49
         Author: Rahul M. Navneeth
 */
 
@@ -97,43 +97,71 @@ void precision(int a) { cout << setprecision(a) << fixed; }
 // CONSTANTS
 const float PI = 3.141592653589793238462;
 const int MOD = 1e9 + 7;
-const int mxn = 3e3+2;
+const int mxn = 2e5 + 1;
 
 /* --------------------- CODE BEGINS ---------------------- */
 
-int N;
-ll a[mxn];
-ll dp[mxn][mxn];
+ll N, dp[mxn];
+ar<ll, 2> a[mxn];
 
-void solve() {
-	cin >> N;
-	ll s = 0;
-	for(int i = 0 ; i < N ; i++) {
-		cin >> a[i];
-		s+=a[i];
+// O(N^2)
+// void solve() {
+// 	cin >> N;
+// 	for(int i = 0 ; i < N ; i++) {
+// 		cin >> a[i][0];
+// 	}
+// 	for(int i = 0 ; i < N ; i++) {
+// 		cin >> a[i][1];
+// 	}
+// 	for(int i = 0 ; i < N ; i++) {
+// 		for(int j = 0 ; j < a[i][0] ; j++)	 {
+// 			dp[a[i][0]] = max(dp[a[i][0]], dp[j] + a[i][1]);
+// 		}
+// 	}
+// 	for(int i = 0 ; i <= N ; i++) {
+// 		cout << dp[i] << " ";
+// 	}
+// 	cout << "\n";
+// 	return;
+// }
+
+void f_max(ll x, ll v) {
+	int t = x;
+	while(x <= N) {
+		dp[x] = max(dp[x], v);
+		x += (x & -x);
 	}
-	for(int i = N - 1 ; i >= 0 ; i--) {
-		for(int j = i ; j < N ; j++) {
-			if(i == j) {
-				dp[i][j] = a[i];
-				continue;
-			}
-			dp[i][j] = max(min(dp[i+2][j], dp[i+1][j-1]) + a[i], min(dp[i+1][j-1], dp[i][j-2]) + a[j]);
-		}
-	}
-	// for(int i = 0 ; i < N ; i++) {
-	// 	for(int j = 0 ; j < N ; j++) {
-	// 		cout << dp[i][j] << " ";
-	// 	}
-	// 	cout << "\n";
-	// }
-	cout << dp[0][N-1]-(s-dp[0][N-1]) << "\n";
-	return;
 }
 
-// 1 0 0 0
-// 2 1 0 0
-// 3 2 1 0
+ll f_max_find(ll x) {
+	ll MX = 0;
+	while(x >= 1) {
+		MX = max(dp[x], MX);
+		x -= (x & -x);
+	}
+	return MX;
+}
+
+// O(N log N)
+void solve() {
+	cin >> N;
+	for(int i = 0 ; i < N ; i++) {
+		cin >> a[i][0];
+	}
+	for(int i = 0 ; i < N ; i++) {
+		cin >> a[i][1];
+	}
+	for(int i = 0 ; i < N ; i++) {
+		ll MX = f_max_find(a[i][0]) + a[i][1];
+		f_max(a[i][0], MX);
+	}
+	ll MX = -1e18;
+	for(int i = 0 ; i <= N ; i++) {
+		MX = max(MX, dp[i]);
+	}
+	cout << MX << "\n";
+	return;
+}
 
 /*---------------------- MAIN DRIVER ------------------------*/
 
@@ -147,9 +175,15 @@ int32_t main() {
   if (M_TIME)
     start = chrono::high_resolution_clock::now();
   int t = 1;
+  int i = 1;
   // cin >> t;
-  while (t--)
+  while (i <= t) {
+  	#ifndef ONLINE_JUDGE
+		cout << "TESTCASE #" << i << "\n";
+	#endif
+	i++;
     solve();
+  }
   if (M_TIME) {
     end = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);

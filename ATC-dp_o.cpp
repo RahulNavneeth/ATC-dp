@@ -1,6 +1,6 @@
 /*
-        File: ATC-dp_l.cpp
-        Date and Time Created: 2024-06-25 01:19:59
+        File: ATC-dp_o.cpp
+        Date and Time Created: 2024-07-02 13:20:45
         Author: Rahul M. Navneeth
 */
 
@@ -97,43 +97,39 @@ void precision(int a) { cout << setprecision(a) << fixed; }
 // CONSTANTS
 const float PI = 3.141592653589793238462;
 const int MOD = 1e9 + 7;
-const int mxn = 3e3+2;
+const int mxn = 22;
 
 /* --------------------- CODE BEGINS ---------------------- */
 
-int N;
-ll a[mxn];
-ll dp[mxn][mxn];
+ll a[mxn][mxn];
+ll dp[1 << mxn];
 
-void solve() {
-	cin >> N;
-	ll s = 0;
+void solve(int tc) {
+	int N; cin >> N;
 	for(int i = 0 ; i < N ; i++) {
-		cin >> a[i];
-		s+=a[i];
-	}
-	for(int i = N - 1 ; i >= 0 ; i--) {
-		for(int j = i ; j < N ; j++) {
-			if(i == j) {
-				dp[i][j] = a[i];
-				continue;
-			}
-			dp[i][j] = max(min(dp[i+2][j], dp[i+1][j-1]) + a[i], min(dp[i+1][j-1], dp[i][j-2]) + a[j]);
+		for(int j = 0 ; j < N ; j++) {
+			cin >> a[i][j];
 		}
 	}
-	// for(int i = 0 ; i < N ; i++) {
-	// 	for(int j = 0 ; j < N ; j++) {
-	// 		cout << dp[i][j] << " ";
-	// 	}
-	// 	cout << "\n";
-	// }
-	cout << dp[0][N-1]-(s-dp[0][N-1]) << "\n";
+	dp[0] = 1;
+	int mask = 1 << N;
+	for(int i = 0 ; i < mask ; i++) {
+		int p = __builtin_popcount(i);
+		for(int j = 0 ; j < N ; j++) {
+			if((1 << j) & i || !a[p][j]) continue;
+			int m = (1 << j) ^ i;
+			dp[m] = mod_add(dp[m], dp[i], MOD);
+		}
+	}
+	// for(int i = 1 ; i < mask ; i++) cout << dp[i] << " ";
+	// cout << "\n";
+	cout << dp[mask - 1] << "\n";
 	return;
 }
 
-// 1 0 0 0
-// 2 1 0 0
-// 3 2 1 0
+// 3
+// 1 2 3 4 5 6 7 8
+// 0 1 
 
 /*---------------------- MAIN DRIVER ------------------------*/
 
@@ -146,10 +142,11 @@ int32_t main() {
   high_resolution_clock::time_point start, end;
   if (M_TIME)
     start = chrono::high_resolution_clock::now();
-  int t = 1;
+  int t = 0;
+  int i = 0;
   // cin >> t;
-  while (t--)
-    solve();
+  while (i++ <= t)
+    solve(i);
   if (M_TIME) {
     end = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);

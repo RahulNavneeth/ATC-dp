@@ -1,6 +1,6 @@
 /*
-        File: ATC-dp_l.cpp
-        Date and Time Created: 2024-06-25 01:19:59
+        File: ATC-dp_n.cpp
+        Date and Time Created: 2024-06-25 17:57:00
         Author: Rahul M. Navneeth
 */
 
@@ -97,43 +97,44 @@ void precision(int a) { cout << setprecision(a) << fixed; }
 // CONSTANTS
 const float PI = 3.141592653589793238462;
 const int MOD = 1e9 + 7;
-const int mxn = 3e3+2;
+const int mxn = 402;
 
 /* --------------------- CODE BEGINS ---------------------- */
 
-int N;
-ll a[mxn];
-ll dp[mxn][mxn];
-
 void solve() {
-	cin >> N;
-	ll s = 0;
-	for(int i = 0 ; i < N ; i++) {
-		cin >> a[i];
-		s+=a[i];
-	}
-	for(int i = N - 1 ; i >= 0 ; i--) {
-		for(int j = i ; j < N ; j++) {
-			if(i == j) {
-				dp[i][j] = a[i];
-				continue;
-			}
-			dp[i][j] = max(min(dp[i+2][j], dp[i+1][j-1]) + a[i], min(dp[i+1][j-1], dp[i][j-2]) + a[j]);
+	ll N;
+    cin >> N;
+    vector<ll> a(N);
+    for (ll i = 0; i < N; ++i) {
+        cin >> a[i];
+    }
+    vector<vector<ll>> dp(N, vector<ll>(N, LLONG_MAX));
+    vector<vector<ll>> sum(N, vector<ll>(N, 0));
+        for (ll l = 0; l < N; ++l) {
+        sum[l][l] = a[l];
+        for (ll r = l + 1; r < N; ++r) {
+            sum[l][r] = sum[l][r - 1] + a[r];
+        }
+    }
+    for (ll i = 0; i < N; ++i) {
+        dp[i][i] = 0;
+    }
+    for (ll len = 2; len <= N; ++len) {
+        for (ll l = 0; l <= N - len; ++l) {
+            ll r = l + len - 1;
+            for (ll k = l; k < r; ++k) {
+                dp[l][r] = min(dp[l][r], dp[l][k] + dp[k + 1][r] + sum[l][r]);
+            }
+        }
+    }
+	for(vector<ll> i : dp) {
+		for(ll j : i) {
+			cout << j << " ";
 		}
+		cout << "\n";
 	}
-	// for(int i = 0 ; i < N ; i++) {
-	// 	for(int j = 0 ; j < N ; j++) {
-	// 		cout << dp[i][j] << " ";
-	// 	}
-	// 	cout << "\n";
-	// }
-	cout << dp[0][N-1]-(s-dp[0][N-1]) << "\n";
-	return;
+    cout << dp[0][N - 1] << "\n";
 }
-
-// 1 0 0 0
-// 2 1 0 0
-// 3 2 1 0
 
 /*---------------------- MAIN DRIVER ------------------------*/
 
